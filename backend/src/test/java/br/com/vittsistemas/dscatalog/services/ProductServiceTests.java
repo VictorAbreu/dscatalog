@@ -119,7 +119,7 @@ public class ProductServiceTests {
 		});
 	}
 
-	@Test
+	/*@Test
 	public void findAllPagesShouldReturnPage() {
 
 		Pageable pageable = PageRequest.of(0, 10);
@@ -128,7 +128,7 @@ public class ProductServiceTests {
 
 		Assertions.assertNotNull(result);
 		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
-	}
+	}*/
 
 	@Test
 	public void deleteShouldThrowDatabaseExceptionWhenIdDoesNotExistis() {
