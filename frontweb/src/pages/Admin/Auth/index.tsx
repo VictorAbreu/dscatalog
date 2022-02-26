@@ -1,4 +1,5 @@
 import { ReactComponent as AuthImage } from 'assets/images/auth-image.svg';
+import { Route, Switch } from 'react-router-dom';
 
 const Auth = () => {
 
@@ -8,6 +9,22 @@ const Auth = () => {
                 <h1>Divulgue seus produtos no DS Catalog</h1>
                 <p>Faça parte do nosso catálogo de divulgação e aumente a venda de seus produtos.</p>
                 <AuthImage/>
+            </div>
+            <div className="auth-form-container">
+                <Switch>
+                    <Route path="/admin/auth/login">
+                        <h1>Card de login</h1>
+                    </Route>
+
+                    <Route path="/admin/auth/signup">
+                        <h1>Card de Signup</h1>
+                    </Route>
+
+                    <Route path="/admin/auth/recover">
+                        <h1>Card de Recover</h1>
+                    </Route>
+                </Switch>
+
             </div>
         </div>
     );
