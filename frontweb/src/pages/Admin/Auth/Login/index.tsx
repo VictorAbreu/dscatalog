@@ -10,8 +10,8 @@ type FormData = {
 }
 
 const Login = () => {
-  const { register, handleSubmit } = useForm();
-  const onSubmit = () => {
+  const { register, handleSubmit } = useForm<FormData>();
+  const onSubmit = (formData : FormData) => {
 
   };
 
