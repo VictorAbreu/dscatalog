@@ -1,6 +1,15 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import history from './history';
+import jwtDecode from 'jwt-decode';
+
+type Role = 'ROLE_OPERATOR' | 'ROLE_ADMIN';
+
+type TokenData = {
+  exp: number;
+  user_name: string;
+  authorities: Role[];
+};
 
 type LoginResponse = {
   access_token: string;
@@ -9,11 +18,11 @@ type LoginResponse = {
   scope: string;
   userFirstName: string;
   userId: number;
-}
+};
 
 export const BASE_URL =
   process.env.REACT_APP_BACKEND_URL ?? 'http://localhost:8080';
-  const tokenKey = 'authData';
+const tokenKey = 'authData';
 
 const CLIENT_ID = process.env.REACT_APP_BACKEND_CLIENT_ID ?? 'dscatalog';
 const CLIENT_SECRET = process.env.REACT_APP_BACKEND_SECRET ?? 'dscatalog123';
@@ -26,7 +35,7 @@ type LoginData = {
   password: string;
 };
 
-export const requestBackendLogin = (loginData : LoginData) => {
+export const requestBackendLogin = (loginData: LoginData) => {
   const headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     Authorization: basicHeader(),
@@ -37,45 +46,72 @@ export const requestBackendLogin = (loginData : LoginData) => {
     grant_type: 'password',
   });
 
-  return axios({method: 'POST', baseURL: BASE_URL, url: '/oauth/token', data, headers})
-}
+  return axios({
+    method: 'POST',
+    baseURL: BASE_URL,
+    url: '/oauth/token',
+    data,
+    headers,
+  });
+};
 
 export const requestBackend = (config: AxiosRequestConfig) => {
+  const headers = config.withCredentials
+    ? {
+        ...config.headers,
+        Authorization: 'Bearer ' + getAuthData().access_token,
+      }
+    : config.headers;
 
-  const headers = config.withCredentials ? {
-    ...config.headers,
-    Authorization: "Bearer " + getAuthData().access_token
-  } : config.headers;
+  return axios({ ...config, baseURL: BASE_URL, headers });
+};
 
-  return axios({ ...config, baseURL: BASE_URL, headers});
-}
-
-export const saveAuthData = (obj : LoginResponse) => {
+export const saveAuthData = (obj: LoginResponse) => {
   localStorage.setItem(tokenKey, JSON.stringify(obj));
-}
+};
 
 export const getAuthData = () => {
-  const str = localStorage.getItem(tokenKey) ?? "{}";
+  const str = localStorage.getItem(tokenKey) ?? '{}';
   return JSON.parse(str) as LoginResponse;
-}
+};
 
 // Add a request interceptor
-axios.interceptors.request.use(function (config) {
-  // Do something before request is sent
-  return config;
-}, function (error) {
-  // Do something with request error
-  return Promise.reject(error);
-});
+axios.interceptors.request.use(
+  function (config) {
+    // Do something before request is sent
+    return config;
+  },
+  function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  }
+);
 
 // Add a response interceptor
-axios.interceptors.response.use(function (response) {
-  // Any status code that lie within the range of 2xx cause this function to trigger
-  // Do something with response data
-  return response;
-}, function (error) {
-  if(error.response.status === 401 || error.response.status === 403){
-    history.push('/admin/auth/login');
+axios.interceptors.response.use(
+  function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    return response;
+  },
+  function (error) {
+    if (error.response.status === 401 || error.response.status === 403) {
+      history.push('/admin/auth/login');
+    }
+    return Promise.reject(error);
   }
-  return Promise.reject(error);
-});
+);
+
+export const getTokenData = () : TokenData | undefined => {
+  try {
+    return jwtDecode(getAuthData().access_token) as TokenData;
+  } catch (error) {
+    return undefined;
+  }
+};
+
+export const isAuthenticated = () : boolean => {
+  const tokenData = getTokenData();
+
+  return (tokenData && tokenData.exp * 1000 > Date.now()) ? true : false;
+}
