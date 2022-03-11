@@ -136,5 +136,6 @@ export const hasAnyRoles = (roles: Role[]) : boolean => {
   }
   return false;
 
-  //return roles.some(role => tokenData.authorities.includes(role));
+  //return roles.some(role => tokenData.authorities.includes(role)); -> Função de alta ordem para resolver o problema acima.
+  
 }
