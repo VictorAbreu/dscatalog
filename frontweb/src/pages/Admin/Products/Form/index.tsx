@@ -1,11 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import { Product } from 'types/product';
 import { requestBackend } from 'util/requests';
 import Select from 'react-select'
 import './styles.css';
+import { Category } from 'types/category';
 
 type UrlParams = {
   productId: string;
@@ -13,21 +14,23 @@ type UrlParams = {
 
 const Form = () => {
 
-  const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-  ]
-
   const { productId } = useParams<UrlParams>();
   const isEditing = productId !== 'create';
   const history = useHistory();
+  const [selectCategories, setSelectGategories] = useState<Category[]>([]);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm<Product>();
+
+  useEffect(() => {
+    requestBackend({url: '/categories'})
+    .then(response => {
+      setSelectGategories(response.data.content);
+    })
+  }, []);
 
   useEffect(() => {
     if(isEditing){
@@ -92,9 +95,11 @@ const Form = () => {
               <div className="margin-botton-30">
                 
               <Select
-                options={options}
+                options={selectCategories}
                 classNamePrefix="product-crud-select"
                 isMulti
+                getOptionLabel={(category: Category) => category.name}
+                getOptionValue={(category: Category) => String(category.id)}
               />
 
               </div>
