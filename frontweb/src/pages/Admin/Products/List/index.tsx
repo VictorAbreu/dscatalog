@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
+import Pagination from 'components/Pagination';
 import ProductCrudCard from 'pages/Admin/Products/ProductCrudCard';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -20,7 +21,7 @@ const List = () => {
       url: '/products',
       params: {
         page: 0,
-        size: 50,
+        size: 12,
       },
     };
     requestBackend(config).then((response) => {
@@ -45,6 +46,9 @@ const List = () => {
           </div>
         ))}
       </div>
+
+      <Pagination/>
+
     </div>
   );
 };
