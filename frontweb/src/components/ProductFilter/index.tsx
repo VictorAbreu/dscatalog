@@ -6,32 +6,45 @@ import Select from 'react-select';
 import { useEffect, useState } from 'react';
 import { requestBackend } from 'util/requests';
 
-type ProductFilterData = {
+export type ProductFilterData = {
   name: string;
   category: Category | null;
 };
 
-const ProductFilter = () => {
+type Props = {
+  onSubmitFilter: (data: ProductFilterData) => void;
+};
+
+const ProductFilter = ( { onSubmitFilter} : Props) => {
   const [selectCategories, setSelectGategories] = useState<Category[]>([]);
 
-  
-  const { register, handleSubmit, setValue, control } = useForm<ProductFilterData>();
-  
-  const handleFormClear = () =>{
+  const { register, handleSubmit, setValue, getValues, control } =
+    useForm<ProductFilterData>();
+
+  const handleFormClear = () => {
     setValue('name', '');
     setValue('category', null);
-  }
+  };
 
   const handleChangeCategory = (value: Category) => {
+    setValue('category', value);
 
-  }
+    const obj: ProductFilterData = {
+      name: getValues('name'),
+      category: getValues('category'),
+    };
+
+    onSubmitFilter(obj);
+  };
 
   useEffect(() => {
     requestBackend({ url: '/categories' }).then((response) => {
       setSelectGategories(response.data.content);
     });
   }, []);
-  const onSubmit = (formData: ProductFilterData) => {};
+  const onSubmit = (formData: ProductFilterData) => {
+    onSubmitFilter(formData);
+  };
 
   return (
     <div className="base-card product-filter-container">
@@ -61,16 +74,17 @@ const ProductFilter = () => {
                   isClearable
                   placeholder="Categoria"
                   classNamePrefix="product-filter-select"
-
-                  onChange={value => handleChangeCategory(value as Category)}
-
+                  onChange={(value) => handleChangeCategory(value as Category)}
                   getOptionLabel={(category: Category) => category.name}
                   getOptionValue={(category: Category) => String(category.id)}
                 />
               )}
             />
           </div>
-          <button onClick={handleFormClear} className="btn btn-outline-secondary btn-product-filter-clear">
+          <button
+            onClick={handleFormClear}
+            className="btn btn-outline-secondary btn-product-filter-clear"
+          >
             LIMPAR <span className="btn-product-filter-word">FILTRO</span>
           </button>
         </div>
