@@ -9,7 +9,7 @@ test('ButtonIcon deveria renderizar o botão com o texto informado', () => {
     render(
         <ButtonIcon text={text} />
     );
-    screen.debug();
+
 
     expect(screen.getByText(text)).toBeInTheDocument();
 
