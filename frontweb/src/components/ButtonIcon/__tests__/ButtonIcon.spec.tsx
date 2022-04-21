@@ -12,5 +12,6 @@ test('ButtonIcon deveria renderizar o botão com o texto informado', () => {
 
 
     expect(screen.getByText(text)).toBeInTheDocument();
+    expect(screen.getByTestId("arrow")).toBeInTheDocument();
 
-})
+});
